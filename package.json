@@ -3,15 +3,27 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "predev": "prisma generate",
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:generate": "node --env-file-if-exists=.env.local ./node_modules/prisma/build/index.js generate",
+    "db:migrate": "node --env-file-if-exists=.env.local ./node_modules/prisma/build/index.js migrate dev",
+    "db:deploy": "node --env-file-if-exists=.env.local ./node_modules/prisma/build/index.js migrate deploy"
   },
   "dependencies": {
+    "@hookform/resolvers": "^7.0.1",
+    "@prisma/adapter-mariadb": "^7.10.1",
+    "@prisma/client": "^7.10.1",
+    "@vercel/blob": "^2.8.2",
+    "lucide-react": "^1.66.0",
+    "mariadb": "^3.5.4",
     "next": "16.4.3",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "react-hook-form": "^7.91.0",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "^4",
@@ -20,6 +32,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.4.3",
+    "prisma": "^7.10.1",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

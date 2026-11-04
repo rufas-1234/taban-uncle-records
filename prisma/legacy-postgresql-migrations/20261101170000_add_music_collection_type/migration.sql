@@ -1,0 +1,1 @@
+ALTER TYPE "FeaturedMediaType" ADD VALUE 'MUSIC_COLLECTION';

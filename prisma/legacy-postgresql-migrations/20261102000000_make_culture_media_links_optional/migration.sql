@@ -1,0 +1,3 @@
+ALTER TABLE "FeaturedMedia"
+ALTER COLUMN "youtubeUrl" DROP NOT NULL,
+ALTER COLUMN "sourceName" DROP NOT NULL;

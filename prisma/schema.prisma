@@ -1,0 +1,208 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+enum BookingStatus {
+  NEW
+  CONTACTED
+  ACCEPTED
+  DECLINED
+}
+
+enum ApprovalEmailStatus {
+  NOT_SENT
+  SENT
+  FAILED
+  NOT_CONFIGURED
+}
+
+enum FeaturedMediaType {
+  SONG
+  MUSIC_COLLECTION
+  PERFORMANCE
+  CULTURE_STORY
+}
+
+enum ArticleKind {
+  NEWS
+  INSIGHT
+}
+
+enum PortfolioType {
+  MUSIC
+  PHOTOGRAPHY
+  VIDEOGRAPHY
+  OTHER
+}
+
+enum TeamMemberGroup {
+  CORE_TEAM
+  PRODUCER
+  SESSION_MUSICIAN
+}
+
+enum AdminRole {
+  SENIOR_ADMIN
+  PUBLISHER
+}
+
+model Booking {
+  id          String        @id @default(cuid())
+  name        String        @db.VarChar(120)
+  email       String        @db.VarChar(320)
+  phone       String?       @db.VarChar(40)
+  service     String        @db.VarChar(80)
+  projectType String        @db.VarChar(160)
+  message     String        @db.VarChar(5000)
+  status      BookingStatus @default(NEW)
+  approvalEmailStatus ApprovalEmailStatus @default(NOT_SENT)
+  approvalEmailSentAt DateTime? @db.DateTime(3)
+  createdAt   DateTime      @default(now()) @db.DateTime(3)
+  updatedAt   DateTime      @updatedAt @db.DateTime(3)
+
+  @@index([status, createdAt])
+  @@index([email])
+}
+
+model AdminAccount {
+  id           String   @id @default(cuid())
+  email        String   @unique @db.VarChar(320)
+  passwordHash String   @db.VarChar(255)
+  role         AdminRole @default(SENIOR_ADMIN)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now()) @db.DateTime(3)
+  updatedAt    DateTime @updatedAt @db.DateTime(3)
+}
+
+model FeaturedArtist {
+  id        String          @id @default(cuid())
+  slug      String          @unique @db.VarChar(180)
+  name      String          @db.VarChar(160)
+  culture   String          @db.VarChar(100)
+  role      String          @db.VarChar(160)
+  bio       String          @db.VarChar(1500)
+  imageUrl  String?         @db.VarChar(2048)
+  sourceUrl String?         @db.VarChar(2048)
+  featured  Boolean         @default(false)
+  published Boolean         @default(false)
+  sortOrder Int             @default(0)
+  createdAt DateTime        @default(now()) @db.DateTime(3)
+  updatedAt DateTime        @updatedAt @db.DateTime(3)
+  media     FeaturedMedia[]
+
+  @@index([published, featured, sortOrder])
+}
+
+model FeaturedMedia {
+  id          String            @id @default(cuid())
+  title       String            @db.VarChar(180)
+  mediaType   FeaturedMediaType @default(SONG)
+  culture     String            @db.VarChar(100)
+  description String            @db.VarChar(1500)
+  youtubeUrl  String?           @unique @db.VarChar(512)
+  sourceName  String?           @db.VarChar(160)
+  imageUrl    String?           @db.VarChar(2048)
+  artistId    String?
+  artist      FeaturedArtist?   @relation(fields: [artistId], references: [id], onDelete: SetNull)
+  featured    Boolean           @default(false)
+  published   Boolean           @default(false)
+  sortOrder   Int               @default(0)
+  createdAt   DateTime          @default(now()) @db.DateTime(3)
+  updatedAt   DateTime          @updatedAt @db.DateTime(3)
+
+  @@index([published, featured, sortOrder])
+  @@index([artistId])
+}
+
+model ServicePricing {
+  id          String   @id @default(cuid())
+  slug        String   @unique @db.VarChar(180)
+  title       String   @db.VarChar(160)
+  category    String   @db.VarChar(80)
+  description String   @db.VarChar(1000)
+  priceAmount Int?
+  currency    String   @default("USD") @db.VarChar(3)
+  priceUnit   String   @default("per project") @db.VarChar(80)
+  featured    Boolean  @default(false)
+  published   Boolean  @default(false)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now()) @db.DateTime(3)
+  updatedAt   DateTime @updatedAt @db.DateTime(3)
+
+  @@index([published, featured, sortOrder])
+}
+
+model EditorialArticle {
+  id          String     @id @default(cuid())
+  slug        String     @unique @db.VarChar(180)
+  kind        ArticleKind
+  title       String     @db.VarChar(180)
+  excerpt     String     @db.VarChar(500)
+  body        String     @db.LongText
+  imageUrl    String?    @db.VarChar(2048)
+  publishedAt DateTime   @default(now()) @db.DateTime(3)
+  featured    Boolean    @default(false)
+  published   Boolean    @default(false)
+  sortOrder   Int        @default(0)
+  createdAt   DateTime   @default(now()) @db.DateTime(3)
+  updatedAt   DateTime   @updatedAt @db.DateTime(3)
+
+  @@index([kind, published, publishedAt])
+}
+
+model StudioEvent {
+  id             String   @id @default(cuid())
+  slug           String   @unique @db.VarChar(180)
+  title          String   @db.VarChar(180)
+  description    String   @db.VarChar(1500)
+  startsAt       DateTime @db.DateTime(3)
+  endsAt         DateTime? @db.DateTime(3)
+  location       String   @db.VarChar(200)
+  imageUrl       String?  @db.VarChar(2048)
+  registrationUrl String? @db.VarChar(2048)
+  featured       Boolean  @default(false)
+  published      Boolean  @default(false)
+  sortOrder      Int      @default(0)
+  createdAt      DateTime @default(now()) @db.DateTime(3)
+  updatedAt      DateTime @updatedAt @db.DateTime(3)
+
+  @@index([published, startsAt])
+}
+
+model TeamMember {
+  id        String   @id @default(cuid())
+  slug      String   @unique @db.VarChar(180)
+  name      String   @db.VarChar(160)
+  title     String   @db.VarChar(160)
+  group     TeamMemberGroup @default(CORE_TEAM)
+  bio       String   @db.VarChar(1500)
+  imageUrl  String?  @db.VarChar(2048)
+  published Boolean  @default(false)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now()) @db.DateTime(3)
+  updatedAt DateTime @updatedAt @db.DateTime(3)
+
+  @@index([published, group, sortOrder])
+}
+
+model PortfolioProject {
+  id          String        @id @default(cuid())
+  slug        String        @unique @db.VarChar(180)
+  title       String        @db.VarChar(180)
+  category    String        @db.VarChar(100)
+  type        PortfolioType @default(OTHER)
+  description String        @db.VarChar(1500)
+  imageUrl    String        @db.VarChar(2048)
+  featured    Boolean       @default(false)
+  published   Boolean       @default(false)
+  sortOrder   Int           @default(0)
+  createdAt   DateTime      @default(now()) @db.DateTime(3)
+  updatedAt   DateTime      @updatedAt @db.DateTime(3)
+
+  @@index([published, featured, sortOrder])
+}
