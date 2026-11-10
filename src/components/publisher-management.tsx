@@ -160,13 +160,13 @@ export function PublisherManagement() {
             type="password"
             autoComplete="new-password"
             required
-            minLength={14}
+            minLength={6}
             maxLength={128}
             value={password}
             onChange={(event) => setPassword(event.target.value)}
             className="editorial-input mt-1"
           />
-          <span className="mt-1 block normal-case tracking-normal text-[#171713]/50">At least 14 characters.</span>
+          <span className="mt-1 block normal-case tracking-normal text-[#171713]/50">At least 6 characters.</span>
         </label>
         <div className="sm:col-span-2">
           <button type="submit" disabled={saving} className="editorial-button-dark disabled:opacity-60">

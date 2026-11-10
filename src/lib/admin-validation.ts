@@ -37,7 +37,7 @@ export const adminLoginSchema = z.object({
 
 export const publisherCreateSchema = z.object({
   email: z.string().trim().email().max(320).toLowerCase(),
-  password: z.string().min(14).max(128),
+  password: z.string().min(6).max(128),
 });
 
 export const publisherStatusSchema = z.object({
